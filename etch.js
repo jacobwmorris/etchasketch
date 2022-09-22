@@ -1,15 +1,16 @@
 const generateButton = document.querySelector("#generate");
 const gridDiv = document.querySelector(".grid");
+const gridPxWidth = 800; //window.getComputedStyle(gridDiv).width
+const gridPxHeight = 800;
+
 
 function colorCell(event) {
     event.target.classList.add("colored");
 }
 
-function makeGridCell() {
+function makeGridCell(cellWidth, cellHeight) {
     let cell = document.createElement("div");
-    let width = 200;
-    let height = 200;
-    cell.setAttribute("style", `width: ${width}px; height: ${height}px;`);
+    cell.setAttribute("style", `width: ${cellWidth}px; height: ${cellHeight}px;`);
     cell.classList.add("gridCell");
 
     cell.addEventListener("mouseenter", colorCell);
@@ -17,30 +18,47 @@ function makeGridCell() {
     return cell;
 }
 
-function makeGridRow() {
+function makeGridRow(width, cellWidth, cellHeight) {
     let row = document.createElement("div");
-    let width = 800;
-    let height = 200;
-    row.setAttribute("style", `width: ${width}px; height: ${height}px;`);
+    row.setAttribute("style", `width: ${width * cellWidth}px; height: ${cellHeight}px;`);
     row.classList.add("gridRow");
 
-    let cells = 4;
-    for (let n = 0; n < cells; ++n) {
-        row.appendChild(makeGridCell());
+    for (let n = 0; n < width; ++n) {
+        row.appendChild(makeGridCell(cellWidth, cellHeight));
     }
 
     return row;
 }
 
-function makeGrid() {
+function makeGrid(width, height) {
     while (gridDiv.childNodes.length > 0) {
         gridDiv.removeChild(gridDiv.firstChild);
     }
 
-    let rows = 4;
-    for (let n = 0; n < rows; ++n) {
-        gridDiv.appendChild(makeGridRow());
+    cellWidth = gridPxWidth / width;
+    cellHeight = gridPxHeight / height;
+
+    for (let n = 0; n < height; ++n) {
+        gridDiv.appendChild(makeGridRow(width, cellWidth, cellHeight));
     }
 }
 
-generateButton.addEventListener("click", makeGrid);
+function generateGrid() {
+    let size = Number(prompt("Enter grid size (Max: 100):", "4"));
+    if (isNaN(size)) {
+        console.log("Warning: Non-number value entered. Defaulting to 4.");
+        size = 4;
+    }
+    if (size < 1) {
+        console.log("Warning: Grid size can not be less than 1.");
+        size = 1;
+    }
+    if (size > 100) {
+        console.log("Warning: Grid size can not be more than 100");
+        size = 100;
+    }
+
+    makeGrid(size, size);
+}
+
+generateButton.addEventListener("click", generateGrid);
